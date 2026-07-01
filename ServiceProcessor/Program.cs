@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using ServiceProcessor.Data;
 using System.IO;
 using ServiceProcessor;
+using Microsoft.Extensions.Logging;
 
 Console.WriteLine("Hệ thống Consumer đã khởi động...");
 
@@ -17,11 +18,19 @@ var connectionString = configuration.GetConnectionString("DefaultConnection");
 var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 
+using var loggerFactory = LoggerFactory.Create(builder => {
+    builder.AddConsole(); // In log ra màn hình console
+    builder.SetMinimumLevel(LogLevel.Information);
+});
+
+// 2. Tạo logger
+var logger = loggerFactory.CreateLogger<ArticleProcessorConsumer>();
+
 using (var dbContext = new AppDbContext(optionsBuilder.Options))
 {
     // Lệnh này sẽ tự động tạo Database Dbqueue và bảng Articles dựa trên appsettings.json
-    dbContext.Database.EnsureCreated(); 
+    dbContext.Database.Migrate(); 
 
-    var consumer = new ArticleProcessorConsumer(dbContext);
+    var consumer = new ArticleProcessorConsumer(dbContext, logger);
     consumer.StartProcessing();
 }

@@ -3,6 +3,8 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using Fizzler.Systems.HtmlAgilityPack;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ServiceCrawler.Models;
 using ServiceProcessor.Data;
 
@@ -10,12 +12,16 @@ namespace ServiceProcessor;
 
 public class ArticleProcessorConsumer
 {
-    private const string QueueName= "crawler";
+    private const string QueueName = "crawler";
     private readonly AppDbContext _dbContext;
+    
+    private readonly ILogger<ArticleProcessorConsumer> _logger;
+    
 
-    public ArticleProcessorConsumer(AppDbContext dbContext)
+    public ArticleProcessorConsumer(AppDbContext dbContext, ILogger<ArticleProcessorConsumer> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
 
     public void StartProcessing()
@@ -62,26 +68,37 @@ public class ArticleProcessorConsumer
 
     public async Task ProcessArticle(string link)
     {
+        _logger.LogInformation("Processing url: " + link);
         var webClient = new HtmlWeb();
-        var doc =  webClient.Load(link);
-        
-        var title = doc.DocumentNode.QuerySelector("h1")?.InnerText.Trim();
-        var desc = doc.DocumentNode.QuerySelector("h2")?.InnerText.Trim();
+        var doc = webClient.Load(link);
         var articleNode = doc.DocumentNode.QuerySelector("article");
-// Remove h1
-        articleNode.QuerySelector("div.section-inner.inset-column.special-column h1")?.Remove();
+        var title = doc.DocumentNode.QuerySelector("h1")?.InnerText.Trim();
+        var desc = doc.DocumentNode.QuerySelector("p.description")?.InnerText.Trim();
+        
+        // Remove h1
+        articleNode.QuerySelector("h1.title-detail")?.Remove();
         var content = articleNode.InnerHtml;
         var article = new Article
         {
             Title = title ?? "No Title",
             Description = desc ?? "",
             Content = content ?? "",
-            Url = link
+            Url = link,
+            CreatedAt = DateTime.Now
         };
-
-        // Gọi vào DBContext để lưu (nhớ inject _dbContext vào class này)
-        _dbContext.Articles.Add(article);
-        await _dbContext.SaveChangesAsync();
+        
+        bool exists = await _dbContext.Articles.AnyAsync(a => a.Url == article.Url);
+            
+        if (!exists)
+        {
+            _dbContext.Articles.Add(article);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("Đã lưu vào Database thành công url: " + link);
+        }
+        else
+        {
+            Console.WriteLine("--> Bài viết đã tồn tại, bỏ qua.");
+        }
 
         Console.WriteLine($" [v] Đã bóc tách xong bài: {article.Title}");
     }

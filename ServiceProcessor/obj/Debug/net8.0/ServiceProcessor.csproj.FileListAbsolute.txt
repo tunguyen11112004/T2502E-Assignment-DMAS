@@ -127,3 +127,8 @@ C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\obj\Debug\net8.0\Ser
 C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\obj\Debug\net8.0\ServiceProcessor.genruntimeconfig.cache
 C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\obj\Debug\net8.0\ref\ServiceProcessor.dll
 C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\bin\Debug\net8.0\appsettings.json
+C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\obj\Debug\net8.0\ServiceProcessor.sourcelink.json
+C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\bin\Debug\net8.0\Microsoft.Extensions.Logging.Configuration.dll
+C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\bin\Debug\net8.0\Microsoft.Extensions.Logging.Console.dll
+C:\Users\ADMIN\RiderProjects\T2502ENetcore\ServiceProcessor\bin\Debug\net8.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll

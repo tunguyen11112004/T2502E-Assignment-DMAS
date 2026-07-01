@@ -9,6 +9,15 @@ public class AppDbContext : DbContext
 
     public DbSet<Article> Articles { get; set; }
     
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
+        // Đảm bảo URL là duy nhất để tránh crawl trùng dữ liệu
+        modelBuilder.Entity<Article>()
+            .HasIndex(a => a.Url)
+            .IsUnique();
+    }
     
     
 }
