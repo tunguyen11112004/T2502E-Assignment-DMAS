@@ -29,7 +29,7 @@ var logger = loggerFactory.CreateLogger<ArticleProcessorConsumer>();
 using (var dbContext = new AppDbContext(optionsBuilder.Options))
 {
     // Lệnh này sẽ tự động tạo Database Dbqueue và bảng Articles dựa trên appsettings.json
-    dbContext.Database.Migrate(); 
+    dbContext.Database.EnsureCreated(); 
 
     var consumer = new ArticleProcessorConsumer(dbContext, logger);
     consumer.StartProcessing();
